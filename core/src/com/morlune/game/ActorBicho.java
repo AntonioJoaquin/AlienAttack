@@ -20,12 +20,9 @@ public class ActorBicho {
 
 	private Texture textureBicho;
 	private Sprite miBicho;
-	private int posicionX;
-	private int posicionY;
-	private int posicionInicialX ;
-	private int posicionInicialY ;
-	private int velocidad = 100;
-//	private float velocidadX ,velocidadY;
+	private int posicionX, posicionY;
+	private int posicionInicialX, posicionInicialY ;
+	private int velocidad, damage;
 	private Rectangle rectangleBicho;
 	
 	
@@ -47,6 +44,8 @@ public class ActorBicho {
 		posicionInicialX = posicionX;
 		posicionInicialY = posicionY;
 
+		velocidad = 100;
+		damage = 10;
 		// hacer que solo aparezcan en los bodes
 		
 		boolean condicion = true;
@@ -87,22 +86,6 @@ public class ActorBicho {
 	// movimiento del bicho y su rectangulo
 	public void movimiento() {
 		// hacer que se dirijan al centro
-
-//		
-//		if ((Gdx.graphics.getWidth()) *0.5 < posicionX) {
-//			posicionX = posicionX
-//					- (int) ((velocidad) * Gdx.graphics.getDeltaTime());
-//		} else if ((Gdx.graphics.getWidth()) * 0.5 > posicionX) {
-//			posicionX = posicionX
-//					+ (int) (velocidad * Gdx.graphics.getDeltaTime());
-//		}
-//		if ((Gdx.graphics.getHeight()) *0.5 < posicionY) {
-//			posicionY = posicionY
-//					- (int) (velocidad * Gdx.graphics.getDeltaTime());
-//		} else if ((Gdx.graphics.getHeight()) * 0.5 > posicionY) {
-//			posicionY = posicionY
-//					+ (int) (velocidad * Gdx.graphics.getDeltaTime());
-//		}
 		
 		angulo = Math.atan2(posicionY-(height/2), posicionX-(width/2));
 		angulo = Math.toDegrees(angulo);
@@ -123,30 +106,6 @@ public class ActorBicho {
 		} else if ((Gdx.graphics.getHeight()) * 0.5 > posicionY) {
 			posicionY = posicionY + (int) (velocidady * Gdx.graphics.getDeltaTime());
 		}
-		
-		
-		
-		// Creo que la solucion esta en eso de variar la velocidad
-		
-		
-		
-//	if ((Gdx.graphics.getWidth()) / 2 < posicionX) {
-//		posicionX-= (velocidad* Math.sin(Math.toRadians(orientar()))) * Gdx.graphics.getDeltaTime();
-//	} else if ((Gdx.graphics.getWidth()) / 2 > posicionX) {
-//		posicionX+= (velocidad* Math.sin(Math.toRadians(orientar()))) * Gdx.graphics.getDeltaTime();
-//	}
-//	if ((Gdx.graphics.getHeight()) / 2 < posicionY) {
-//		posicionY-= (velocidad* Math.cos(Math.toRadians(orientar()))) * Gdx.graphics.getDeltaTime();
-//		
-//	} else if ((Gdx.graphics.getHeight()) / 2 > posicionY) {
-//		posicionY+= (velocidad* Math.cos(Math.toRadians(orientar()))) * Gdx.graphics.getDeltaTime();
-//		
-//	}
-//		
-//		posicionX+= (velocidad* Math.cos(Math.toRadians(orientar()))) * Gdx.graphics.getDeltaTime();
-//		posicionY+= (velocidad* Math.sin(Math.toRadians(orientar()))) * Gdx.graphics.getDeltaTime();
-//		
-		
 
 		miBicho.setPosition(posicionX, posicionY);
 		rectangleBicho.setX(posicionX);
@@ -159,4 +118,6 @@ public class ActorBicho {
 		return rectangleBicho.overlaps(X);
 	}
 
+
+	public int getDamage(){return damage;}
 }
