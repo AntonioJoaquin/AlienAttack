@@ -7,6 +7,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.math.Rectangle;
+import com.morlune.game.bicho.ActorBicho;
+import com.morlune.game.bicho.SelectorBicho;
 
 import java.util.Iterator;
 
@@ -19,11 +21,13 @@ public class ActionPlay {
     private ActorBicho bicho;
     private SceneCity city; //objeto de SceneCity
     private MyGdxGame main; //objeto de la clase principal necesario para obtener altura y anchura
+    private SelectorBicho selector;
 
     public ActionPlay(){
         main = new MyGdxGame();
         Bichos = new Array<ActorBicho>(); // instanciar array
         city = new SceneCity(main.getHeight(), main.getWidth()); //inicializamos el objeto ciudad
+        selector = new SelectorBicho();
     }
 
     public Array<ActorBicho> getBichos(){return Bichos;}
@@ -36,8 +40,7 @@ public class ActionPlay {
 
     // metodo aparecer actor bicho
     public long spawnActorBicho() {
-        ActorBicho Bicho = new ActorBicho(); 	// creamos un bicho
-        Bichos.add(Bicho);						// lo metemos en la array
+        Bichos.add(selector.selection());						// lo metemos en la array
         return TimeUtils.nanoTime(); // devolvemos el momento en que lo guardamos
     }
 
@@ -51,8 +54,8 @@ public class ActionPlay {
         }
         // si colisiona con el rectangulo y hacemos click lo borramos de la lista
         if (bicho.colision(RectangleRaton) && Gdx.input.isTouched()){
+            Puntos = Puntos + bicho.getPoints();
             iter.remove();
-            Puntos = Puntos + 10;
         }
         return Puntos;
     }
@@ -61,8 +64,11 @@ public class ActionPlay {
         if(bicho.colision(city.getRectangleCity())){
             puntos = city.loseHealth(bicho.getDamage());
             if(puntos <= 50 && puntos > 0) city.setCityTexture(1);
-            else if(puntos <= 0) city.setCityTexture(2);
-            else city.setCityTexture(0);
+            else if(puntos >= 50) city.setCityTexture(0);
+            else{
+                city.setCityTexture(2);
+                main.dispose();
+            }
         }
         return puntos;
     }

@@ -10,6 +10,9 @@ import com.badlogic.gdx.math.Rectangle;
  */
 public class SceneCity {
 
+    //constante para inicializar la vida
+    private final int HEALTH = 200;
+
     //declaramos las variables:
     //textura que tendrá la ciudad
     private Texture cityTexture;
@@ -19,7 +22,7 @@ public class SceneCity {
     private Rectangle rectangleCity;
     //vida de la ciudad
     private int cityHealth;
-    //enum de los estados de la ciudad
+    //array de los estados de la ciudad
     Texture[] towns = {new Texture("casa.png"), new Texture("casa_med.png"), new Texture("casa_null.png") };
 
     public SceneCity(int height, int width){
@@ -31,7 +34,7 @@ public class SceneCity {
         // instanciar rectangulo colision ciudad
         rectangleCity = new Rectangle((width/2)-city.getWidth()/2,(height/2)-city.getHeight()/2, city.getWidth(), city.getHeight());
         //inicializamos la vida de la ciudad
-        cityHealth = 100;
+        cityHealth = HEALTH;
     }
 
     //método para devolver la zona de colisión de la ciudad
