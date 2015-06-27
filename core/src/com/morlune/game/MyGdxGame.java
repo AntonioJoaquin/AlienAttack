@@ -4,7 +4,6 @@ import java.util.Iterator;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -37,11 +36,8 @@ public class MyGdxGame implements ApplicationListener {
 	private SpriteBatch batch;		// lienzo
 	private SceneCity city;	// ciudad
 
-	private BitmapFont ContadorPuntos;	// mostrar contador de puntos
-	private int Puntos; // cantidad de puntos
-
-    private BitmapFont contadorVida; //mostrar contador de vida de la ciudad
-    private int puntosCityHealth; //puntos de vida de la ciudad
+	private BitmapFont contadorPuntos, contadorVida, puntuacionMax;	// mostrar contador de puntos, mostrar contador de vida de la ciudad
+	private int puntos, puntosCityHealth; // cantidad de puntos, puntos de vida de la ciudad
 
 	private Rectangle RectangleRaton; 	// rectangulo de colision del Raton
 	float ratonX, ratonY;				// x e y del raton
@@ -64,12 +60,14 @@ public class MyGdxGame implements ApplicationListener {
 		RectangleRaton = new Rectangle(ratonX, height - ratonY, 30, 30); //instanciar rectangulo colision raton
 		
 		// Puntos
-		ContadorPuntos = new BitmapFont();
-		Puntos = 0;
+		contadorPuntos = new BitmapFont();
+		puntos = 0;
 
         //Vida de la ciudad
         contadorVida = new BitmapFont();
         puntosCityHealth = city.getCityHealth();
+
+        puntuacionMax = new BitmapFont();
 	}
 
 	@Override
@@ -80,19 +78,22 @@ public class MyGdxGame implements ApplicationListener {
 	@Override
 	public void render () {
 		//Color del fondo y no se que las
-		Gdx.gl.glClearColor(1, 0, 0, 1);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		/*Gdx.gl.glClearColor(1, 0, 0, 1);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);*/
 
 		//inicio del lienzo 
 		batch.begin();
-		// fondo
+        // fondo
 		batch.draw(background, 0, 0);
 
 		// Puntos
-		ContadorPuntos.draw(batch, "" + Puntos, 50, height - 20);
+		contadorPuntos.draw(batch, "Puntuacion: " + puntos, 50, height - 20);
 
         //Vida ciudad
-        contadorVida.draw(batch, "" + puntosCityHealth, 150, height-20);
+        contadorVida.draw(batch, "Vida Ciudad: " + puntosCityHealth, width-300, height-20);
+
+        //Puntuación máxima
+        puntuacionMax.draw(batch, "Puntuacion Maxima: " + action.getPuntuacionMaxima(), 200, height-20);
 
 		// dibujo la ciudad
 		city.show(batch);
@@ -100,9 +101,8 @@ public class MyGdxGame implements ApplicationListener {
 		// bucle para dibujar bichos
 		Iterator<ActorBicho> iterx = action.getBichos().iterator();
 
-		while (iterx.hasNext()) {
-			action.drawBicho(iterx, batch);
-		}
+		while (iterx.hasNext()) action.drawBicho(iterx, batch);
+
 
 		batch.end();
 
@@ -116,22 +116,21 @@ public class MyGdxGame implements ApplicationListener {
 		Iterator<ActorBicho> iter = action.getBichos().iterator();
 
 		while (iter.hasNext()) {
-			Puntos = action.movementBicho(city, iter, RectangleRaton, Puntos); //puntos obtenidos al matar bichos
-			puntosCityHealth = action.damage(city, puntosCityHealth); //puntos de salud de la ciudad perdidos
+			puntos = action.movementBicho(city, iter, RectangleRaton, puntos); //puntos obtenidos al matar bichos
+            try {
+                puntosCityHealth = action.damage(city, puntosCityHealth); //puntos de salud de la ciudad perdidos
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
-			// se podra borra
+            // se podra borra
 			// si cocamos la pantalla o hacemos click con el raton
 			// damos posicion aleatoria a bicho de prueba
 			// ponemos control a uno
-			if (Gdx.input.isTouched()) {
-				if (control == 0) {
-					control = 1;
-				}
-			}
+			if (Gdx.input.isTouched()) if (control == 0) control = 1;
+
 			// si no hacemos click ponemos control a cero
-			if (!Gdx.input.isTouched()) {
-				control = 0;
-			}
+			if (!Gdx.input.isTouched()) control = 0;
 
 			// damos posicion a x e y de raton
 			ratonX = Gdx.input.getX();
@@ -154,6 +153,7 @@ public class MyGdxGame implements ApplicationListener {
 
 	@Override
 	public void dispose() {
+        puntuacionMax.dispose();
 		batch.dispose();
 		background.dispose();
 	}

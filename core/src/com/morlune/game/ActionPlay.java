@@ -21,13 +21,18 @@ public class ActionPlay {
     private ActorBicho bicho;
     private SceneCity city; //objeto de SceneCity
     private MyGdxGame main; //objeto de la clase principal necesario para obtener altura y anchura
-    private SelectorBicho selector;
+    private SelectorBicho selector; //objeto para decidir aleatoriamente qué bicho sale
+    private int puntuacionMaxima;
+    private Thread espera;
+    private Preferencias preferencias;
 
     public ActionPlay(){
         main = new MyGdxGame();
+        preferencias = new Preferencias();
         Bichos = new Array<ActorBicho>(); // instanciar array
         city = new SceneCity(main.getHeight(), main.getWidth()); //inicializamos el objeto ciudad
         selector = new SelectorBicho();
+        puntuacionMaxima = preferencias.getPreferences().getInteger("puntuacionMaxima");
     }
 
     public Array<ActorBicho> getBichos(){return Bichos;}
@@ -44,7 +49,7 @@ public class ActionPlay {
         return TimeUtils.nanoTime(); // devolvemos el momento en que lo guardamos
     }
 
-    public int movementBicho(SceneCity city, Iterator<ActorBicho> iter, Rectangle RectangleRaton, int Puntos){
+    public int movementBicho(SceneCity city, Iterator<ActorBicho> iter, Rectangle RectangleRaton, int puntos){
         bicho = iter.next();
         bicho.movimiento(); // moviendo bicho
 
@@ -54,19 +59,26 @@ public class ActionPlay {
         }
         // si colisiona con el rectangulo y hacemos click lo borramos de la lista
         if (bicho.colision(RectangleRaton) && Gdx.input.isTouched()){
-            Puntos = Puntos + bicho.getPoints();
+            puntos = puntos + bicho.getPoints();
             iter.remove();
+            if(puntuacionMaxima < puntos) puntuacionMaxima = puntos;
         }
-        return Puntos;
+        return puntos;
     }
 
-    public int damage(SceneCity city, int puntos){
+    public int getPuntuacionMaxima(){return puntuacionMaxima;}
+
+    //daño en la ciudad
+    public int damage(SceneCity city, int puntos) throws InterruptedException {
         if(bicho.colision(city.getRectangleCity())){
             puntos = city.loseHealth(bicho.getDamage());
-            if(puntos <= 50 && puntos > 0) city.setCityTexture(1);
-            else if(puntos >= 50) city.setCityTexture(0);
+            if(puntos <= 100 && puntos > 0) city.setCityTexture(1);
+            else if(puntos >= 100) city.setCityTexture(0);
             else{
                 city.setCityTexture(2);
+                espera.sleep(2000); //realizamos una espera de 2 segundos cuando la vida de la ciudad a 0
+                preferencias.setPreferences(this);  //llamamos al proceso de guardado
+                preferencias.getPreferences().flush();
                 main.dispose();
             }
         }
